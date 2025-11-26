@@ -1,0 +1,80 @@
+# WordPress
+.htaccess
+wp-config.php
+wp-config-sample.php
+
+# WordPress Core
+/wp-admin/
+/wp-includes/
+/wp-content/uploads/
+/wp-content/upgrade/
+/wp-content/backup-db/
+/wp-content/advanced-cache.php
+/wp-content/wp-cache-config.php
+/wp-content/cache/
+/wp-content/blogs.dir/
+/wp-content/upgrade/
+/wp-content/themes/twenty*/
+/wp-content/plugins/hello.php
+/wp-content/plugins/akismet/
+
+# WooCommerce
+/wp-content/plugins/woocommerce/
+
+# Logs
+*.log
+error_log
+debug.log
+wc-status-cron-debug.log
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Icon?
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# PHP
+composer.phar
+vendor/
+*.cache
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Node modules (if any)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build files
+dist/
+build/
+*.min.js
+*.min.css
+

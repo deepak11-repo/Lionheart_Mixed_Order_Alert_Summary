@@ -27,17 +27,27 @@ function get_status_cron_email_template($summary_data) {
         $total_unprocessed_items += $order['walsworth_fulfillment']['total_not_processed_qty'];
         
         $order_edit_url = admin_url('post.php?post=' . $order['order_id'] . '&action=edit');
-        $status_display = ucwords(str_replace('-', ' ', $order['order_status']));
+        
+        // Format status display with exact naming style
+        if ($order['order_status'] === 'processing') {
+            $status_display = 'Processing';
+        } elseif ($order['order_status'] === 'partially-shipped') {
+            $status_display = 'Partially Shipped';
+        } elseif ($order['order_status'] === 'pending-payment-partially-shipped') {
+            $status_display = 'Pending payment partially shipped';
+        } else {
+            $status_display = ucwords(str_replace('-', ' ', $order['order_status']));
+        }
         
         // Status badge colors matching user requirements
         $status_bg_color = '#fff3cd';
         $status_text_color = '#856404';
         if ($order['order_status'] === 'partially-shipped') {
             $status_bg_color = 'rgb(217, 169, 68)';
-            $status_text_color = '#856404';
+            $status_text_color = '#1a0f05';
         } elseif ($order['order_status'] === 'pending-payment-partially-shipped') {
             $status_bg_color = 'rgb(234, 207, 134)';
-            $status_text_color = '#856404';
+            $status_text_color = '#1a0f05';
         } elseif ($order['order_status'] === 'processing') {
             $status_bg_color = 'rgb(198, 225, 198)';
             $status_text_color = '#155724';
@@ -57,7 +67,7 @@ function get_status_cron_email_template($summary_data) {
                 <span style="font-size: 12px; color: #6c757d; font-family: \'Segoe UI\', sans-serif;">$' . esc_html(number_format($order['order_total'], 2)) . '</span>
             </td>
             <td style="padding: 14px 16px; text-align: center; border-bottom: 1px solid #f1f3f5;" align="center">
-                <span style="display: inline-block; padding: 4px 8px; background-color: ' . esc_attr($status_bg_color) . '; color: ' . esc_attr($status_text_color) . '; border-radius: 4px; font-weight: 600; font-size: 10px; text-transform: uppercase; font-family: \'Segoe UI\', sans-serif;">' . esc_html($status_display) . '</span>
+                <span style="display: inline-block; padding: 4px 8px; background-color: ' . esc_attr($status_bg_color) . '; color: ' . esc_attr($status_text_color) . '; border-radius: 4px; font-weight: 600; font-size: 10px; font-family: \'Segoe UI\', sans-serif;">' . esc_html($status_display) . '</span>
             </td>
             <td style="padding: 14px 16px; text-align: center; border-bottom: 1px solid #f1f3f5;" align="center">
                 <span style="font-size: 20px; font-weight: 700; color: #dc3545; font-family: \'Segoe UI\', sans-serif;">' . esc_html($order['walsworth_fulfillment']['total_not_processed_qty']) . '</span><br>
@@ -74,16 +84,26 @@ function get_status_cron_email_template($summary_data) {
         $order_number = $index + 1;
         $order_edit_url = admin_url('post.php?post=' . $order['order_id'] . '&action=edit');
         
-        // Format status display with custom colors
-        $status_display = ucwords(str_replace('-', ' ', $order['order_status']));
+        // Format status display with exact naming style
+        if ($order['order_status'] === 'processing') {
+            $status_display = 'Processing';
+        } elseif ($order['order_status'] === 'partially-shipped') {
+            $status_display = 'Partially Shipped';
+        } elseif ($order['order_status'] === 'pending-payment-partially-shipped') {
+            $status_display = 'Pending payment partially shipped';
+        } else {
+            $status_display = ucwords(str_replace('-', ' ', $order['order_status']));
+        }
+        
+        // Status badge colors matching user requirements
         $status_bg_color = '#fff3cd';
         $status_text_color = '#856404';
         if ($order['order_status'] === 'partially-shipped') {
             $status_bg_color = 'rgb(217, 169, 68)';
-            $status_text_color = '#856404';
+            $status_text_color = '#1a0f05';
         } elseif ($order['order_status'] === 'pending-payment-partially-shipped') {
             $status_bg_color = 'rgb(234, 207, 134)';
-            $status_text_color = '#856404';
+            $status_text_color = '#1a0f05';
         } elseif ($order['order_status'] === 'processing') {
             $status_bg_color = 'rgb(198, 225, 198)';
             $status_text_color = '#155724';
@@ -134,7 +154,7 @@ function get_status_cron_email_template($summary_data) {
                                     🛒 <a href="' . esc_url($order_edit_url) . '" style="color: #264584; text-decoration: none;">Order #' . esc_html($order['order_number']) . '</a>
                                 </h3>
                                 <p style="margin: 0; font-size: 13px; color: #6c757d; font-family: \'Segoe UI\', sans-serif;">
-                                    <span style="display: inline-block; padding: 3px 10px; background-color: ' . esc_attr($status_bg_color) . '; color: ' . esc_attr($status_text_color) . '; border-radius: 4px; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-family: \'Segoe UI\', sans-serif;">' . esc_html($status_display) . '</span>
+                                    <span style="display: inline-block; padding: 3px 10px; background-color: ' . esc_attr($status_bg_color) . '; color: ' . esc_attr($status_text_color) . '; border-radius: 4px; font-weight: 600; font-size: 11px; letter-spacing: 0.5px; font-family: \'Segoe UI\', sans-serif;">' . esc_html($status_display) . '</span>
                                 </p>
                             </td>
                             <td style="text-align: right; vertical-align: middle;" align="right" valign="middle">

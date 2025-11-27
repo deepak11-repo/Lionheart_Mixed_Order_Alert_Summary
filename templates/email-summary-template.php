@@ -1,149 +1,149 @@
 <?php
 /**
  * Email Template for Status-Based Daily Summary Cron
- * 
+ *
  * This file contains the HTML email template specifically designed for
  * the status-based daily summary cron job. It displays orders with
  * specific statuses (Processing, Partially Shipped, or Pending Payment Partially Shipped)
  * that have Walsworth mixed fulfillment notes.
- * 
+ *
  * @param array $summary_data Array containing order summary data
  * @return string HTML email content
  */
 
 // Prevent direct access
-if (!defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-function get_status_cron_email_template($summary_data) {
-    $orders_html = '';
-    $total_unprocessed_items = 0;
-    
-    // Build Quick Overview Table rows
-    $quick_overview_rows = '';
-    foreach ($summary_data['orders'] as $index => $order) {
-        $order_number = $index + 1;
-        $total_unprocessed_items += $order['walsworth_fulfillment']['total_not_processed_qty'];
-        
-        $order_edit_url = admin_url('post.php?post=' . $order['order_id'] . '&action=edit');
-        
-        // Format status display with exact naming style
-        if ($order['order_status'] === 'processing') {
-            $status_display = 'Processing';
-        } elseif ($order['order_status'] === 'partially-shipped') {
-            $status_display = 'Partially Shipped';
-        } elseif ($order['order_status'] === 'pending-payment-partially-shipped') {
-            $status_display = 'Pending payment partially shipped';
-        } else {
-            $status_display = ucwords(str_replace('-', ' ', $order['order_status']));
-        }
-        
-        // Status badge colors matching user requirements
-        $status_bg_color = '#fff3cd';
-        $status_text_color = '#856404';
-        if ($order['order_status'] === 'partially-shipped') {
-            $status_bg_color = 'rgb(217, 169, 68)';
-            $status_text_color = '#1a0f05';
-        } elseif ($order['order_status'] === 'pending-payment-partially-shipped') {
-            $status_bg_color = 'rgb(234, 207, 134)';
-            $status_text_color = '#1a0f05';
-        } elseif ($order['order_status'] === 'processing') {
-            $status_bg_color = 'rgb(198, 225, 198)';
-            $status_text_color = '#155724';
-        }
-        
-        // Format order date for display
-        $order_date_formatted = date('M d, H:i', strtotime($order['order_date']));
-        
-        $quick_overview_rows .= '
+function get_status_cron_email_template( $summary_data ) {
+	$orders_html             = '';
+	$total_unprocessed_items = 0;
+
+	// Build Quick Overview Table rows
+	$quick_overview_rows = '';
+	foreach ( $summary_data['orders'] as $index => $order ) {
+		$order_number             = $index + 1;
+		$total_unprocessed_items += $order['walsworth_fulfillment']['total_not_processed_qty'];
+
+		$order_edit_url = admin_url( 'post.php?post=' . $order['order_id'] . '&action=edit' );
+
+		// Format status display with exact naming style
+		if ( $order['order_status'] === 'processing' ) {
+			$status_display = 'Processing';
+		} elseif ( $order['order_status'] === 'partially-shipped' ) {
+			$status_display = 'Partially Shipped';
+		} elseif ( $order['order_status'] === 'pending-payment-partially-shipped' ) {
+			$status_display = 'Pending payment partially shipped';
+		} else {
+			$status_display = ucwords( str_replace( '-', ' ', $order['order_status'] ) );
+		}
+
+		// Status badge colors matching user requirements
+		$status_bg_color   = '#fff3cd';
+		$status_text_color = '#856404';
+		if ( $order['order_status'] === 'partially-shipped' ) {
+			$status_bg_color   = 'rgb(217, 169, 68)';
+			$status_text_color = '#1a0f05';
+		} elseif ( $order['order_status'] === 'pending-payment-partially-shipped' ) {
+			$status_bg_color   = 'rgb(234, 207, 134)';
+			$status_text_color = '#1a0f05';
+		} elseif ( $order['order_status'] === 'processing' ) {
+			$status_bg_color   = 'rgb(198, 225, 198)';
+			$status_text_color = '#155724';
+		}
+
+		// Format order date for display
+		$order_date_formatted = date( 'M d, H:i', strtotime( $order['order_date'] ) );
+
+		$quick_overview_rows .= '
         <tr style="background-color: #fff;">
             <td style="padding: 14px 16px; border-bottom: 1px solid #f1f3f5;">
-                <a href="' . esc_url($order_edit_url) . '" style="color: #264584; font-weight: 700; text-decoration: none; font-size: 14px; font-family: \'Segoe UI\', sans-serif;">#' . esc_html($order['order_number']) . '</a><br>
-                <span style="font-size: 12px; color: #6c757d; font-family: \'Segoe UI\', sans-serif;">' . esc_html($order_date_formatted) . '</span>
+                <a href="' . esc_url( $order_edit_url ) . '" style="color: #264584; font-weight: 700; text-decoration: none; font-size: 14px; font-family: \'Segoe UI\', sans-serif;">#' . esc_html( $order['order_number'] ) . '</a><br>
+                <span style="font-size: 12px; color: #6c757d; font-family: \'Segoe UI\', sans-serif;">' . esc_html( $order_date_formatted ) . '</span>
             </td>
             <td style="padding: 14px 16px; border-bottom: 1px solid #f1f3f5;">
-                <span style="color: #212529; font-size: 13px; font-weight: 600; font-family: \'Segoe UI\', sans-serif;">' . esc_html($order['customer_name']) . '</span><br>
-                <span style="font-size: 12px; color: #6c757d; font-family: \'Segoe UI\', sans-serif;">$' . esc_html(number_format($order['order_total'], 2)) . '</span>
+                <span style="color: #212529; font-size: 13px; font-weight: 600; font-family: \'Segoe UI\', sans-serif;">' . esc_html( $order['customer_name'] ) . '</span><br>
+                <span style="font-size: 12px; color: #6c757d; font-family: \'Segoe UI\', sans-serif;">$' . esc_html( number_format( $order['order_total'], 2 ) ) . '</span>
             </td>
             <td style="padding: 14px 16px; text-align: center; border-bottom: 1px solid #f1f3f5;" align="center">
-                <span style="display: inline-block; padding: 4px 8px; background-color: ' . esc_attr($status_bg_color) . '; color: ' . esc_attr($status_text_color) . '; border-radius: 4px; font-weight: 600; font-size: 10px; font-family: \'Segoe UI\', sans-serif;">' . esc_html($status_display) . '</span>
+                <span style="display: inline-block; padding: 4px 8px; background-color: ' . esc_attr( $status_bg_color ) . '; color: ' . esc_attr( $status_text_color ) . '; border-radius: 4px; font-weight: 600; font-size: 10px; font-family: \'Segoe UI\', sans-serif;">' . esc_html( $status_display ) . '</span>
             </td>
             <td style="padding: 14px 16px; text-align: center; border-bottom: 1px solid #f1f3f5;" align="center">
-                <span style="font-size: 20px; font-weight: 700; color: #dc3545; font-family: \'Segoe UI\', sans-serif;">' . esc_html($order['walsworth_fulfillment']['total_not_processed_qty']) . '</span><br>
+                <span style="font-size: 20px; font-weight: 700; color: #dc3545; font-family: \'Segoe UI\', sans-serif;">' . esc_html( $order['walsworth_fulfillment']['total_not_processed_qty'] ) . '</span><br>
                 <span style="font-size: 11px; color: #6c757d; font-family: \'Segoe UI\', sans-serif;">items</span>
             </td>
             <td style="padding: 14px 16px; text-align: center; border-bottom: 1px solid #f1f3f5;" align="center">
-                <a href="' . esc_url($order_edit_url) . '" style="display: inline-block; padding: 6px 12px; background-color: #264584; color: #fff; text-decoration: none; border-radius: 4px; font-size: 11px; font-weight: 600; font-family: \'Segoe UI\', sans-serif;">View</a>
+                <a href="' . esc_url( $order_edit_url ) . '" style="display: inline-block; padding: 6px 12px; background-color: #264584; color: #fff; text-decoration: none; border-radius: 4px; font-size: 11px; font-weight: 600; font-family: \'Segoe UI\', sans-serif;">View</a>
             </td>
         </tr>';
-    }
-    
-    // Build detailed order breakdown
-    foreach ($summary_data['orders'] as $index => $order) {
-        $order_number = $index + 1;
-        $order_edit_url = admin_url('post.php?post=' . $order['order_id'] . '&action=edit');
-        
-        // Format status display with exact naming style
-        if ($order['order_status'] === 'processing') {
-            $status_display = 'Processing';
-        } elseif ($order['order_status'] === 'partially-shipped') {
-            $status_display = 'Partially Shipped';
-        } elseif ($order['order_status'] === 'pending-payment-partially-shipped') {
-            $status_display = 'Pending payment partially shipped';
-        } else {
-            $status_display = ucwords(str_replace('-', ' ', $order['order_status']));
-        }
-        
-        // Status badge colors matching user requirements
-        $status_bg_color = '#fff3cd';
-        $status_text_color = '#856404';
-        if ($order['order_status'] === 'partially-shipped') {
-            $status_bg_color = 'rgb(217, 169, 68)';
-            $status_text_color = '#1a0f05';
-        } elseif ($order['order_status'] === 'pending-payment-partially-shipped') {
-            $status_bg_color = 'rgb(234, 207, 134)';
-            $status_text_color = '#1a0f05';
-        } elseif ($order['order_status'] === 'processing') {
-            $status_bg_color = 'rgb(198, 225, 198)';
-            $status_text_color = '#155724';
-        }
-        
-        // Build unified items table (fulfilled and not fulfilled together)
-        $items_table_rows = '';
-        
-        // Add fulfilled items
-        if (!empty($order['walsworth_fulfillment']['processed_items'])) {
-            foreach ($order['walsworth_fulfillment']['processed_items'] as $item) {
-                $items_table_rows .= '
+	}
+
+	// Build detailed order breakdown
+	foreach ( $summary_data['orders'] as $index => $order ) {
+		$order_number   = $index + 1;
+		$order_edit_url = admin_url( 'post.php?post=' . $order['order_id'] . '&action=edit' );
+
+		// Format status display with exact naming style
+		if ( $order['order_status'] === 'processing' ) {
+			$status_display = 'Processing';
+		} elseif ( $order['order_status'] === 'partially-shipped' ) {
+			$status_display = 'Partially Shipped';
+		} elseif ( $order['order_status'] === 'pending-payment-partially-shipped' ) {
+			$status_display = 'Pending payment partially shipped';
+		} else {
+			$status_display = ucwords( str_replace( '-', ' ', $order['order_status'] ) );
+		}
+
+		// Status badge colors matching user requirements
+		$status_bg_color   = '#fff3cd';
+		$status_text_color = '#856404';
+		if ( $order['order_status'] === 'partially-shipped' ) {
+			$status_bg_color   = 'rgb(217, 169, 68)';
+			$status_text_color = '#1a0f05';
+		} elseif ( $order['order_status'] === 'pending-payment-partially-shipped' ) {
+			$status_bg_color   = 'rgb(234, 207, 134)';
+			$status_text_color = '#1a0f05';
+		} elseif ( $order['order_status'] === 'processing' ) {
+			$status_bg_color   = 'rgb(198, 225, 198)';
+			$status_text_color = '#155724';
+		}
+
+		// Build unified items table (fulfilled and not fulfilled together)
+		$items_table_rows = '';
+
+		// Add fulfilled items
+		if ( ! empty( $order['walsworth_fulfillment']['processed_items'] ) ) {
+			foreach ( $order['walsworth_fulfillment']['processed_items'] as $item ) {
+				$items_table_rows .= '
                 <tr style="background-color: #fff;">
-                    <td style="padding: 12px 14px; color: #212529; border-bottom: 1px solid #f1f3f5; font-size: 13px; font-family: \'Segoe UI\', sans-serif;" align="left">' . esc_html($item['product']) . '</td>
-                    <td style="padding: 12px 14px; color: #212529; border-bottom: 1px solid #f1f3f5; font-weight: 600; text-align: center; font-size: 14px; font-family: \'Segoe UI\', sans-serif;" align="center">' . esc_html($item['quantity']) . '</td>
+                    <td style="padding: 12px 14px; color: #212529; border-bottom: 1px solid #f1f3f5; font-size: 13px; font-family: \'Segoe UI\', sans-serif;" align="left">' . esc_html( $item['product'] ) . '</td>
+                    <td style="padding: 12px 14px; color: #212529; border-bottom: 1px solid #f1f3f5; font-weight: 600; text-align: center; font-size: 14px; font-family: \'Segoe UI\', sans-serif;" align="center">' . esc_html( $item['quantity'] ) . '</td>
                     <td style="padding: 12px 14px; border-bottom: 1px solid #f1f3f5; text-align: center;" align="center">
                         <span style="display: inline-block; padding: 4px 10px; background-color: #d4edda; color: #155724; border-radius: 4px; font-weight: 600; font-size: 11px; font-family: \'Segoe UI\', sans-serif;">✅ Fulfilled</span>
                     </td>
                 </tr>';
-            }
-        }
-        
-        // Add NOT fulfilled items
-        if (!empty($order['walsworth_fulfillment']['not_processed_items'])) {
-            foreach ($order['walsworth_fulfillment']['not_processed_items'] as $item) {
-                $items_table_rows .= '
+			}
+		}
+
+		// Add NOT fulfilled items
+		if ( ! empty( $order['walsworth_fulfillment']['not_processed_items'] ) ) {
+			foreach ( $order['walsworth_fulfillment']['not_processed_items'] as $item ) {
+				$items_table_rows .= '
                 <tr style="background-color: #fff;">
-                    <td style="padding: 12px 14px; color: #212529; border-bottom: 1px solid #f1f3f5; font-size: 13px; font-family: \'Segoe UI\', sans-serif;" align="left">' . esc_html($item['product']) . '</td>
-                    <td style="padding: 12px 14px; color: #212529; border-bottom: 1px solid #f1f3f5; font-weight: 600; text-align: center; font-size: 14px; font-family: \'Segoe UI\', sans-serif;" align="center">' . esc_html($item['quantity']) . '</td>
+                    <td style="padding: 12px 14px; color: #212529; border-bottom: 1px solid #f1f3f5; font-size: 13px; font-family: \'Segoe UI\', sans-serif;" align="left">' . esc_html( $item['product'] ) . '</td>
+                    <td style="padding: 12px 14px; color: #212529; border-bottom: 1px solid #f1f3f5; font-weight: 600; text-align: center; font-size: 14px; font-family: \'Segoe UI\', sans-serif;" align="center">' . esc_html( $item['quantity'] ) . '</td>
                     <td style="padding: 12px 14px; border-bottom: 1px solid #f1f3f5; text-align: center;" align="center">
                         <span style="display: inline-block; padding: 4px 10px; background-color: #f8d7da; color: #721c24; border-radius: 4px; font-weight: 600; font-size: 11px; font-family: \'Segoe UI\', sans-serif;">❌ Not Fulfilled</span>
                     </td>
                 </tr>';
-            }
-        }
-        
-        // Format order date for display
-        $order_date_formatted = date('Y-m-d H:i:s', strtotime($order['order_date']));
-        
-        $orders_html .= '
+			}
+		}
+
+		// Format order date for display
+		$order_date_formatted = date( 'Y-m-d H:i:s', strtotime( $order['order_date'] ) );
+
+		$orders_html .= '
         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 30px; border: 2px solid #e8e8e8; border-radius: 8px; overflow: hidden;">
             <tr>
                 <td style="background: linear-gradient(to right, #f8f9fa 0%, #e9ecef 100%); padding: 20px 24px; border-bottom: 1px solid #dee2e6;">
@@ -151,14 +151,14 @@ function get_status_cron_email_template($summary_data) {
                         <tr>
                             <td style="vertical-align: middle;" valign="middle">
                                 <h3 style="margin: 0 0 6px 0; color: #264584; font-family: \'Segoe UI\', sans-serif; font-size: 20px; font-weight: 700; line-height: 1.3;">
-                                    🛒 <a href="' . esc_url($order_edit_url) . '" style="color: #264584; text-decoration: none;">Order #' . esc_html($order['order_number']) . '</a>
+                                    🛒 <a href="' . esc_url( $order_edit_url ) . '" style="color: #264584; text-decoration: none;">Order #' . esc_html( $order['order_number'] ) . '</a>
                                 </h3>
                                 <p style="margin: 0; font-size: 13px; color: #6c757d; font-family: \'Segoe UI\', sans-serif;">
-                                    <span style="display: inline-block; padding: 3px 10px; background-color: ' . esc_attr($status_bg_color) . '; color: ' . esc_attr($status_text_color) . '; border-radius: 4px; font-weight: 600; font-size: 11px; letter-spacing: 0.5px; font-family: \'Segoe UI\', sans-serif;">' . esc_html($status_display) . '</span>
+                                    <span style="display: inline-block; padding: 3px 10px; background-color: ' . esc_attr( $status_bg_color ) . '; color: ' . esc_attr( $status_text_color ) . '; border-radius: 4px; font-weight: 600; font-size: 11px; letter-spacing: 0.5px; font-family: \'Segoe UI\', sans-serif;">' . esc_html( $status_display ) . '</span>
                                 </p>
                             </td>
                             <td style="text-align: right; vertical-align: middle;" align="right" valign="middle">
-                                <a href="' . esc_url($order_edit_url) . '" style="display: inline-block; padding: 10px 20px; background-color: #264584; color: #fff; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600; font-family: \'Segoe UI\', sans-serif;">View Order →</a>
+                                <a href="' . esc_url( $order_edit_url ) . '" style="display: inline-block; padding: 10px 20px; background-color: #264584; color: #fff; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600; font-family: \'Segoe UI\', sans-serif;">View Order →</a>
                             </td>
                         </tr>
                     </table>
@@ -170,21 +170,21 @@ function get_status_cron_email_template($summary_data) {
                         <tr>
                             <td width="50%" style="padding: 8px 0; font-size: 14px; color: #495057; vertical-align: top; font-family: \'Segoe UI\', sans-serif;" valign="top">
                                 <strong style="color: #212529;">👤 Customer:</strong><br>
-                                <span style="color: #6c757d;">' . esc_html($order['customer_name']) . '</span>
+                                <span style="color: #6c757d;">' . esc_html( $order['customer_name'] ) . '</span>
                             </td>
                             <td width="50%" style="padding: 8px 0; font-size: 14px; color: #495057; vertical-align: top; font-family: \'Segoe UI\', sans-serif;" valign="top">
                                 <strong style="color: #212529;">📧 Email:</strong><br>
-                                <span style="color: #6c757d;">' . esc_html($order['customer_email']) . '</span>
+                                <span style="color: #6c757d;">' . esc_html( $order['customer_email'] ) . '</span>
                             </td>
                         </tr>
                         <tr>
                             <td width="50%" style="padding: 8px 0; font-size: 14px; color: #495057; vertical-align: top; font-family: \'Segoe UI\', sans-serif;" valign="top">
                                 <strong style="color: #212529;">📅 Order Date:</strong><br>
-                                <span style="color: #6c757d;">' . esc_html($order_date_formatted) . '</span>
+                                <span style="color: #6c757d;">' . esc_html( $order_date_formatted ) . '</span>
                             </td>
                             <td width="50%" style="padding: 8px 0; font-size: 14px; color: #495057; vertical-align: top; font-family: \'Segoe UI\', sans-serif;" valign="top">
                                 <strong style="color: #212529;">💰 Order Total:</strong><br>
-                                <span style="color: #6c757d; font-weight: 600;">$' . esc_html(number_format($order['order_total'], 2)) . '</span>
+                                <span style="color: #6c757d; font-weight: 600;">$' . esc_html( number_format( $order['order_total'], 2 ) ) . '</span>
                             </td>
                         </tr>
                     </table>
@@ -205,13 +205,13 @@ function get_status_cron_email_template($summary_data) {
                 </td>
             </tr>
         </table>';
-    }
-    
-    // Format generated date
-    $generated_date = date('Y-m-d \a\t g:i A', strtotime($summary_data['date_generated']));
-    
-    // HTML Email Template with inline styles for maximum email client compatibility
-    $html = '<!DOCTYPE html>
+	}
+
+	// Format generated date
+	$generated_date = date( 'Y-m-d \a\t g:i A', strtotime( $summary_data['date_generated'] ) );
+
+	// HTML Email Template with inline styles for maximum email client compatibility
+	$html = '<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -243,7 +243,7 @@ function get_status_cron_email_template($summary_data) {
                                                 <tr>
                                                     <td id="header_wrapper" style="padding: 36px 48px; display: block;">
                                                         <h1 style="font-family: \'Segoe UI\', sans-serif; font-size: 28px; font-weight: 600; line-height: 150%; margin: 0; color: #fff; background-color: inherit; text-align: left;" bgcolor="inherit">📋 Daily Mixed Order Summary</h1>
-                                                        <p style="margin: 8px 0 0 0; font-size: 13px; color: #fff; opacity: 0.85; font-weight: normal; font-family: \'Segoe UI\', sans-serif;">Generated: ' . esc_html($generated_date) . '</p>
+                                                        <p style="margin: 8px 0 0 0; font-size: 13px; color: #fff; opacity: 0.85; font-weight: normal; font-family: \'Segoe UI\', sans-serif;">Generated: ' . esc_html( $generated_date ) . '</p>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -283,7 +283,7 @@ function get_status_cron_email_template($summary_data) {
                                                                                     <table width="100%" cellpadding="0" cellspacing="0" border="0">
                                                                                         <tr>
                                                                                             <td style="padding: 0;">
-                                                                                                <p style="margin: 0; font-size: 38px; font-weight: 700; color: #fff; line-height: 1.2; font-family: \'Segoe UI\', sans-serif;">' . esc_html($summary_data['total_orders']) . '</p>
+                                                                                                <p style="margin: 0; font-size: 38px; font-weight: 700; color: #fff; line-height: 1.2; font-family: \'Segoe UI\', sans-serif;">' . esc_html( $summary_data['total_orders'] ) . '</p>
                                                                                                 <p style="margin: 8px 0 0 0; font-size: 13px; color: rgba(255,255,255,0.9); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; font-family: \'Segoe UI\', sans-serif;">Orders Requiring<br>Attention</p>
                                                                                             </td>
                                                                                         </tr>
@@ -294,7 +294,7 @@ function get_status_cron_email_template($summary_data) {
                                                                                     <table width="100%" cellpadding="0" cellspacing="0" border="0">
                                                                                         <tr>
                                                                                             <td style="padding: 0;">
-                                                                                                <p style="margin: 0; font-size: 38px; font-weight: 700; color: #fff; line-height: 1.2; font-family: \'Segoe UI\', sans-serif;">' . esc_html($total_unprocessed_items) . '</p>
+                                                                                                <p style="margin: 0; font-size: 38px; font-weight: 700; color: #fff; line-height: 1.2; font-family: \'Segoe UI\', sans-serif;">' . esc_html( $total_unprocessed_items ) . '</p>
                                                                                                 <p style="margin: 8px 0 0 0; font-size: 13px; color: rgba(255,255,255,0.9); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; font-family: \'Segoe UI\', sans-serif;">Unprocessed<br>Items</p>
                                                                                             </td>
                                                                                         </tr>
@@ -376,5 +376,5 @@ function get_status_cron_email_template($summary_data) {
 </body>
 </html>';
 
-    return $html;
+	return $html;
 }

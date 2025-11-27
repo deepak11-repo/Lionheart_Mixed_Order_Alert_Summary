@@ -1,86 +1,86 @@
 <?php
 /**
  * Email Template for WooCommerce Order Note Alerts
- * 
+ *
  * This file contains the HTML email template for mixed order fulfillment alerts.
- * 
+ *
  * @param array $data Array containing order, note, and fulfillment data
  * @return string HTML email content
  */
 
 // Prevent direct access
-if (!defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-function get_order_note_email_template($data) {
-    $order = $data['order'];
-    $note = $data['note'];
-    $fulfillment = $data['walsworth_fulfillment'];
-    
-    // Format status display with exact naming style
-    if ($order['order_status'] === 'processing') {
-        $status_display = 'Processing';
-    } elseif ($order['order_status'] === 'partially-shipped') {
-        $status_display = 'Partially Shipped';
-    } elseif ($order['order_status'] === 'pending-payment-partially-shipped') {
-        $status_display = 'Pending payment partially shipped';
-    } else {
-        $status_display = ucwords(str_replace('-', ' ', $order['order_status']));
-    }
-    
-    // Status badge colors matching user requirements
-    $status_bg_color = '#fff3cd';
-    $status_text_color = '#856404';
-    if ($order['order_status'] === 'partially-shipped') {
-        $status_bg_color = 'rgb(217, 169, 68)';
-        $status_text_color = '#1a0f05';
-    } elseif ($order['order_status'] === 'pending-payment-partially-shipped') {
-        $status_bg_color = 'rgb(234, 207, 134)';
-        $status_text_color = '#1a0f05';
-    } elseif ($order['order_status'] === 'processing') {
-        $status_bg_color = 'rgb(198, 225, 198)';
-        $status_text_color = '#155724';
-    }
-    
-    // Build unified items table (fulfilled and not fulfilled together)
-    $items_table_rows = '';
-    
-    // Add fulfilled items
-    if (!empty($fulfillment['processed_items'])) {
-        foreach ($fulfillment['processed_items'] as $item) {
-            $items_table_rows .= '
+function get_order_note_email_template( $data ) {
+	$order       = $data['order'];
+	$note        = $data['note'];
+	$fulfillment = $data['walsworth_fulfillment'];
+
+	// Format status display with exact naming style
+	if ( $order['order_status'] === 'processing' ) {
+		$status_display = 'Processing';
+	} elseif ( $order['order_status'] === 'partially-shipped' ) {
+		$status_display = 'Partially Shipped';
+	} elseif ( $order['order_status'] === 'pending-payment-partially-shipped' ) {
+		$status_display = 'Pending payment partially shipped';
+	} else {
+		$status_display = ucwords( str_replace( '-', ' ', $order['order_status'] ) );
+	}
+
+	// Status badge colors matching user requirements
+	$status_bg_color   = '#fff3cd';
+	$status_text_color = '#856404';
+	if ( $order['order_status'] === 'partially-shipped' ) {
+		$status_bg_color   = 'rgb(217, 169, 68)';
+		$status_text_color = '#1a0f05';
+	} elseif ( $order['order_status'] === 'pending-payment-partially-shipped' ) {
+		$status_bg_color   = 'rgb(234, 207, 134)';
+		$status_text_color = '#1a0f05';
+	} elseif ( $order['order_status'] === 'processing' ) {
+		$status_bg_color   = 'rgb(198, 225, 198)';
+		$status_text_color = '#155724';
+	}
+
+	// Build unified items table (fulfilled and not fulfilled together)
+	$items_table_rows = '';
+
+	// Add fulfilled items
+	if ( ! empty( $fulfillment['processed_items'] ) ) {
+		foreach ( $fulfillment['processed_items'] as $item ) {
+			$items_table_rows .= '
             <tr style="background-color: #fff;">
-                <td style="padding: 12px 14px; color: #212529; border-bottom: 1px solid #f1f3f5; font-size: 13px; font-family: \'Segoe UI\', sans-serif;" align="left">' . esc_html($item['product']) . '</td>
-                <td style="padding: 12px 14px; color: #212529; border-bottom: 1px solid #f1f3f5; font-weight: 600; text-align: center; font-size: 14px; font-family: \'Segoe UI\', sans-serif;" align="center">' . esc_html($item['quantity']) . '</td>
+                <td style="padding: 12px 14px; color: #212529; border-bottom: 1px solid #f1f3f5; font-size: 13px; font-family: \'Segoe UI\', sans-serif;" align="left">' . esc_html( $item['product'] ) . '</td>
+                <td style="padding: 12px 14px; color: #212529; border-bottom: 1px solid #f1f3f5; font-weight: 600; text-align: center; font-size: 14px; font-family: \'Segoe UI\', sans-serif;" align="center">' . esc_html( $item['quantity'] ) . '</td>
                 <td style="padding: 12px 14px; border-bottom: 1px solid #f1f3f5; text-align: center;" align="center">
                     <span style="display: inline-block; padding: 4px 10px; background-color: #d4edda; color: #155724; border-radius: 4px; font-weight: 600; font-size: 11px; font-family: \'Segoe UI\', sans-serif;">✅ Fulfilled</span>
                 </td>
             </tr>';
-        }
-    }
-    
-    // Add NOT fulfilled items
-    if (!empty($fulfillment['not_processed_items'])) {
-        foreach ($fulfillment['not_processed_items'] as $item) {
-            $items_table_rows .= '
+		}
+	}
+
+	// Add NOT fulfilled items
+	if ( ! empty( $fulfillment['not_processed_items'] ) ) {
+		foreach ( $fulfillment['not_processed_items'] as $item ) {
+			$items_table_rows .= '
             <tr style="background-color: #fff;">
-                <td style="padding: 12px 14px; color: #212529; border-bottom: 1px solid #f1f3f5; font-size: 13px; font-family: \'Segoe UI\', sans-serif;" align="left">' . esc_html($item['product']) . '</td>
-                <td style="padding: 12px 14px; color: #212529; border-bottom: 1px solid #f1f3f5; font-weight: 600; text-align: center; font-size: 14px; font-family: \'Segoe UI\', sans-serif;" align="center">' . esc_html($item['quantity']) . '</td>
+                <td style="padding: 12px 14px; color: #212529; border-bottom: 1px solid #f1f3f5; font-size: 13px; font-family: \'Segoe UI\', sans-serif;" align="left">' . esc_html( $item['product'] ) . '</td>
+                <td style="padding: 12px 14px; color: #212529; border-bottom: 1px solid #f1f3f5; font-weight: 600; text-align: center; font-size: 14px; font-family: \'Segoe UI\', sans-serif;" align="center">' . esc_html( $item['quantity'] ) . '</td>
                 <td style="padding: 12px 14px; border-bottom: 1px solid #f1f3f5; text-align: center;" align="center">
                     <span style="display: inline-block; padding: 4px 10px; background-color: #f8d7da; color: #721c24; border-radius: 4px; font-weight: 600; font-size: 11px; font-family: \'Segoe UI\', sans-serif;">❌ Not Fulfilled</span>
                 </td>
             </tr>';
-        }
-    }
-    
-    $order_edit_url = admin_url('post.php?post=' . $order['order_id'] . '&action=edit');
-    
-    // Format order date for display
-    $order_date_formatted = date('Y-m-d H:i:s', strtotime($order['order_date']));
-    
-    // HTML Email Template with inline styles for maximum email client compatibility
-    $html = '<!DOCTYPE html>
+		}
+	}
+
+	$order_edit_url = admin_url( 'post.php?post=' . $order['order_id'] . '&action=edit' );
+
+	// Format order date for display
+	$order_date_formatted = date( 'Y-m-d H:i:s', strtotime( $order['order_date'] ) );
+
+	// HTML Email Template with inline styles for maximum email client compatibility
+	$html = '<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -125,7 +125,7 @@ function get_order_note_email_template($data) {
                                             <table width="100%" cellpadding="0" cellspacing="0" border="0">
                                                 <tr>
                                                     <td style="padding: 0;">
-                                                        <p style="margin: 0; color: #856404; font-family: \'Segoe UI\', sans-serif; font-size: 14px; line-height: 150%;"><strong>⚡ Action Required:</strong> ' . esc_html($fulfillment['total_not_processed_qty']) . ' items from this order need alternative fulfillment.</p>
+                                                        <p style="margin: 0; color: #856404; font-family: \'Segoe UI\', sans-serif; font-size: 14px; line-height: 150%;"><strong>⚡ Action Required:</strong> ' . esc_html( $fulfillment['total_not_processed_qty'] ) . ' items from this order need alternative fulfillment.</p>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -152,14 +152,14 @@ function get_order_note_email_template($data) {
                                                                                         <tr>
                                                                                             <td style="vertical-align: middle;" valign="middle">
                                                                                                 <h3 style="margin: 0 0 6px 0; color: #264584; font-family: \'Segoe UI\', sans-serif; font-size: 20px; font-weight: 700; line-height: 1.3;">
-                                                                                                    🛒 <a href="' . esc_url($order_edit_url) . '" style="color: #264584; text-decoration: none;">Order #' . esc_html($order['order_number']) . '</a>
+                                                                                                    🛒 <a href="' . esc_url( $order_edit_url ) . '" style="color: #264584; text-decoration: none;">Order #' . esc_html( $order['order_number'] ) . '</a>
                                                                                                 </h3>
                                                                                                 <p style="margin: 0; font-size: 13px; color: #6c757d; font-family: \'Segoe UI\', sans-serif;">
-                                                                                                    <span style="display: inline-block; padding: 3px 10px; background-color: ' . esc_attr($status_bg_color) . '; color: ' . esc_attr($status_text_color) . '; border-radius: 4px; font-weight: 600; font-size: 11px; letter-spacing: 0.5px; font-family: \'Segoe UI\', sans-serif;">' . esc_html($status_display) . '</span>
+                                                                                                    <span style="display: inline-block; padding: 3px 10px; background-color: ' . esc_attr( $status_bg_color ) . '; color: ' . esc_attr( $status_text_color ) . '; border-radius: 4px; font-weight: 600; font-size: 11px; letter-spacing: 0.5px; font-family: \'Segoe UI\', sans-serif;">' . esc_html( $status_display ) . '</span>
                                                                                                 </p>
                                                                                             </td>
                                                                                             <td style="text-align: right; vertical-align: middle;" align="right" valign="middle">
-                                                                                                <a href="' . esc_url($order_edit_url) . '" style="display: inline-block; padding: 10px 20px; background-color: #264584; color: #fff; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600; font-family: \'Segoe UI\', sans-serif;">View Order →</a>
+                                                                                                <a href="' . esc_url( $order_edit_url ) . '" style="display: inline-block; padding: 10px 20px; background-color: #264584; color: #fff; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600; font-family: \'Segoe UI\', sans-serif;">View Order →</a>
                                                                                             </td>
                                                                                         </tr>
                                                                                     </table>
@@ -171,21 +171,21 @@ function get_order_note_email_template($data) {
                                                                                         <tr>
                                                                                             <td width="50%" style="padding: 8px 0; font-size: 14px; color: #495057; vertical-align: top; font-family: \'Segoe UI\', sans-serif;" valign="top">
                                                                                                 <strong style="color: #212529;">👤 Customer:</strong><br>
-                                                                                                <span style="color: #6c757d;">' . esc_html($order['customer_name']) . '</span>
+                                                                                                <span style="color: #6c757d;">' . esc_html( $order['customer_name'] ) . '</span>
                                                                                             </td>
                                                                                             <td width="50%" style="padding: 8px 0; font-size: 14px; color: #495057; vertical-align: top; font-family: \'Segoe UI\', sans-serif;" valign="top">
                                                                                                 <strong style="color: #212529;">📧 Email:</strong><br>
-                                                                                                <span style="color: #6c757d;">' . esc_html($order['customer_email']) . '</span>
+                                                                                                <span style="color: #6c757d;">' . esc_html( $order['customer_email'] ) . '</span>
                                                                                             </td>
                                                                                         </tr>
                                                                                         <tr>
                                                                                             <td width="50%" style="padding: 8px 0; font-size: 14px; color: #495057; vertical-align: top; font-family: \'Segoe UI\', sans-serif;" valign="top">
                                                                                                 <strong style="color: #212529;">📅 Order Date:</strong><br>
-                                                                                                <span style="color: #6c757d;">' . esc_html($order_date_formatted) . '</span>
+                                                                                                <span style="color: #6c757d;">' . esc_html( $order_date_formatted ) . '</span>
                                                                                             </td>
                                                                                             <td width="50%" style="padding: 8px 0; font-size: 14px; color: #495057; vertical-align: top; font-family: \'Segoe UI\', sans-serif;" valign="top">
                                                                                                 <strong style="color: #212529;">💰 Order Total:</strong><br>
-                                                                                                <span style="color: #6c757d; font-weight: 600;">$' . esc_html(number_format($order['order_total'], 2)) . '</span>
+                                                                                                <span style="color: #6c757d; font-weight: 600;">$' . esc_html( number_format( $order['order_total'], 2 ) ) . '</span>
                                                                                             </td>
                                                                                         </tr>
                                                                                     </table>
@@ -220,16 +220,16 @@ function get_order_note_email_template($data) {
                                                                                         <tr>
                                                                                             <td width="50%" style="padding: 8px 0; font-size: 14px; color: #495057; vertical-align: top; font-family: \'Segoe UI\', sans-serif;" valign="top">
                                                                                                 <strong style="color: #212529;">Added by:</strong><br>
-                                                                                                <span style="color: #6c757d;">' . esc_html($note['note_author']) . '</span>
+                                                                                                <span style="color: #6c757d;">' . esc_html( $note['note_author'] ) . '</span>
                                                                                             </td>
                                                                                             <td width="50%" style="padding: 8px 0; font-size: 14px; color: #495057; vertical-align: top; font-family: \'Segoe UI\', sans-serif;" valign="top">
                                                                                                 <strong style="color: #212529;">Date:</strong><br>
-                                                                                                <span style="color: #6c757d;">' . esc_html($note['note_date']) . '</span>
+                                                                                                <span style="color: #6c757d;">' . esc_html( $note['note_date'] ) . '</span>
                                                                                             </td>
                                                                                         </tr>
                                                                                     </table>
                                                                                     <div style="background-color: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 4px solid #264584;">
-                                                                                        <p style="margin: 0; white-space: pre-line; font-family: \'Segoe UI\', sans-serif; font-size: 13px; color: #212529; line-height: 1.6;">' . esc_html($note['note_content']) . '</p>
+                                                                                        <p style="margin: 0; white-space: pre-line; font-family: \'Segoe UI\', sans-serif; font-size: 13px; color: #212529; line-height: 1.6;">' . esc_html( $note['note_content'] ) . '</p>
                                                                                     </div>
                                                                                 </td>
                                                                             </tr>
@@ -279,5 +279,5 @@ function get_order_note_email_template($data) {
 </body>
 </html>';
 
-    return $html;
+	return $html;
 }

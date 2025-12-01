@@ -204,14 +204,15 @@ class WooCommerce_OrderNote_Email_Alert {
     
     /**
      * Check if order note is a Walsworth fulfillment note
+     * Only triggers for mixed orders (both processed and NOT processed items)
      */
     private function is_walsworth_note($note_content) {
-        // Check for the Walsworth pattern
-        if (strpos($note_content, 'Walsworth processed:') !== false) {
-            return true;
-        }
+        // Check for BOTH patterns - only alert on mixed orders (case-insensitive)
+        $has_processed = stripos($note_content, 'Walsworth processed:') !== false;
+        $has_not_processed = stripos($note_content, 'Walsworth DID NOT process:') !== false;
         
-        return false;
+        // Only return true if BOTH sections are present (mixed order)
+        return $has_processed && $has_not_processed;
     }
     
     /**
@@ -232,9 +233,9 @@ class WooCommerce_OrderNote_Email_Alert {
             $data['timestamp'] = $matches[1];
         }
         
-        // Extract processed items
-        if (preg_match('/Walsworth processed:(.*?)(?:Walsworth DID NOT process:|$)/s', $note_content, $matches)) {
-            preg_match_all('/Qty (\d+) of \[(.*?)\]/', $matches[1], $items);
+        // Extract processed items (case-insensitive)
+        if (preg_match('/Walsworth processed:(.*?)(?:Walsworth DID NOT process:|$)/si', $note_content, $matches)) {
+            preg_match_all('/Qty (\d+) of \[(.*?)\]/i', $matches[1], $items);
             for ($i = 0; $i < count($items[0]); $i++) {
                 $qty = intval($items[1][$i]);
                 $data['processed_items'][] = array(
@@ -245,9 +246,9 @@ class WooCommerce_OrderNote_Email_Alert {
             }
         }
         
-        // Extract NOT processed items
-        if (preg_match('/Walsworth DID NOT process:(.*?)$/s', $note_content, $matches)) {
-            preg_match_all('/Qty (\d+) of \[(.*?)\]/', $matches[1], $items);
+        // Extract NOT processed items (case-insensitive)
+        if (preg_match('/Walsworth DID NOT process:(.*?)$/si', $note_content, $matches)) {
+            preg_match_all('/Qty (\d+) of \[(.*?)\]/i', $matches[1], $items);
             for ($i = 0; $i < count($items[0]); $i++) {
                 $qty = intval($items[1][$i]);
                 $data['not_processed_items'][] = array(

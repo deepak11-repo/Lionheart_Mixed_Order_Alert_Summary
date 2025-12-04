@@ -42,25 +42,41 @@ class WC_Daily_Summary_Status_Cron {
 		}
 	}
 
+
+	/**
+	 * Adds a daily cron schedule to the given array of schedules.
+	 *
+	 * If the 'daily_at_7am' schedule is not already present in the given array,
+	 * it is added with an interval of 86400 seconds (1 day) and a display name of
+	 * 'Daily at 7:00 AM UTC'.
+	 *
+	 * @param array $schedules Array of cron schedules.
+	 * @return array Modified array of cron schedules.
+	 */
 	public function add_daily_cron_schedule( $schedules ) {
-		// Reuse the same schedule as the other cron
-		if ( ! isset( $schedules['daily_at_745pm'] ) ) {
-			$schedules['daily_at_745pm'] = array(
+		// Reuse the same schedule as the other cron.
+		if ( ! isset( $schedules['daily_at_7am'] ) ) {
+			$schedules['daily_at_7am'] = array(
 				'interval' => 86400,
-				'display'  => __( 'Daily at 7:45 PM UTC' ),
+				'display'  => __( 'Daily at 7:00 AM UTC' ),
 			);
 		}
 		return $schedules;
 	}
 
+	/**
+	 * Schedules the daily cron job to run at 7:00 AM UTC.
+	 * This method is automatically called during the WordPress init action.
+	 * It checks if the cron job is already scheduled and if not, it schedules it.
+	 */
 	public function schedule_daily_cron() {
 		$next_scheduled = wp_next_scheduled( $this->cron_hook );
 
 		if ( ! $next_scheduled ) {
-			// Calculate next 7:45 PM UTC
-			$dt        = new DateTime( 'tomorrow 19:45:00', new DateTimeZone( 'UTC' ) );
+			// Calculate next 7:00 AM UTC - 2:00 AM EST.
+			$dt        = new DateTime( 'tomorrow 07:00:00', new DateTimeZone( 'UTC' ) );
 			$timestamp = $dt->getTimestamp();
-			wp_schedule_event( $timestamp, 'daily_at_745pm', $this->cron_hook );
+			wp_schedule_event( $timestamp, 'daily_at_7am', $this->cron_hook );
 		}
 	}
 
@@ -318,13 +334,13 @@ class WC_Daily_Summary_Status_Cron {
 		require_once plugin_dir_path( __DIR__ ) . 'templates/email-summary-template.php';
 		$message = get_status_cron_email_template( $summary_data );
 
-		$subject = '📊 Daily Mixed Order Summary (Status-Based) - ' . $summary_data['total_orders'] . ' Orders Require Attention';
+		$subject = 'Pending Order(s) Summary || ' . $summary_data['total_orders'] . ' Orders Require Attention';
 
 		$from_email = 'noreply@' . sanitize_text_field( wp_parse_url( home_url(), PHP_URL_HOST ) );
 
 		$headers = array(
 			'Content-Type: text/html; charset=UTF-8',
-			'From: Lion Heart Daily Summary <' . sanitize_email( $from_email ) . '>',
+			'From: The Lionheart Foundation <' . sanitize_email( $from_email ) . '>',
 		);
 
 		return wp_mail( $recipients, $subject, $message, $headers );

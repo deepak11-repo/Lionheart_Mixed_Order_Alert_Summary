@@ -126,7 +126,7 @@ function get_status_cron_email_template( $summary_data ) {
 			}
 		}
 
-		// Add NOT fulfilled items
+		// Add NOT fulfilled items.
 		if ( ! empty( $order['walsworth_fulfillment']['not_processed_items'] ) ) {
 			foreach ( $order['walsworth_fulfillment']['not_processed_items'] as $item ) {
 				$items_table_rows .= '

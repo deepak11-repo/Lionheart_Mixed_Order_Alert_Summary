@@ -25,17 +25,17 @@ if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins',
 }
 
 // Include core classes
-require_once plugin_dir_path( __FILE__ ) . 'includes/class-order-note-email-alert.php';
+// require_once plugin_dir_path( __FILE__ ) . 'includes/class-order-note-email-alert.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-daily-summary-status-cron.php';
 
 // Include email templates
-require_once plugin_dir_path( __FILE__ ) . 'templates/email-alert-template.php';
+// require_once plugin_dir_path( __FILE__ ) . 'templates/email-alert-template.php';
 require_once plugin_dir_path( __FILE__ ) . 'templates/email-summary-template.php';
 
-// Initialize the main plugin class
+// Initialize the main plugin class.
 new WooCommerce_OrderNote_Email_Alert();
 
-// Register deactivation hook to clean up cron jobs
+// Register deactivation hook to clean up cron jobs.
 register_deactivation_hook(
 	__FILE__,
 	function () {
